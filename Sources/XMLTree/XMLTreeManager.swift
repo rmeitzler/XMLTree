@@ -5,9 +5,11 @@
 //  Created by Richard Meitzler on 8/12/21.
 //
 
-import AppKit
+import Foundation
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
+
 class XMLManager: ObservableObject {
   @Published var xmlData: Data?
   @Published var treeData: XMLTree?
