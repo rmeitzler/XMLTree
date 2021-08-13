@@ -23,11 +23,7 @@ public class XMLManager: ObservableObject {
         do {
             let contents = try String(contentsOfFile: filepath)
             xmlData = contents.data(using: .utf8)
-          
-            if let data = xmlData {
-              let parser = XMLTreeParser(data)
-              treeData = parser.output
-            }
+            parseXML(data: xmlData)
           
         } catch let XMLTreeError.attributeNotFound(failedKey) {
           print("Could not find attribute: \(failedKey)")
@@ -38,6 +34,13 @@ public class XMLManager: ObservableObject {
         catch {
             print("Could not load file")
           }
+    }
+  }
+  
+  public func parseXML(data: Data?) {
+    if let data = xmlData {
+      let parser = XMLTreeParser(data)
+      treeData = parser.output
     }
   }
   
