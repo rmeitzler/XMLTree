@@ -14,6 +14,10 @@ public class XMLManager: ObservableObject {
   @Published public var xmlData: Data?
   @Published public var treeData: XMLTree?
   
+  public init() {
+    
+  }
+  
   public func loadXml(filename: String) {
     if let filepath = Bundle.main.path(forResource: filename, ofType: "xml") {
         do {
