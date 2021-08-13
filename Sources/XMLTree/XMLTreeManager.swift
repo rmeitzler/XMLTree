@@ -10,11 +10,11 @@ import Foundation
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
 
-class XMLManager: ObservableObject {
-  @Published var xmlData: Data?
-  @Published var treeData: XMLTree?
+public class XMLManager: ObservableObject {
+  @Published public var xmlData: Data?
+  @Published public var treeData: XMLTree?
   
-  func loadXml(filename: String) {
+  public func loadXml(filename: String) {
     if let filepath = Bundle.main.path(forResource: filename, ofType: "xml") {
         do {
             let contents = try String(contentsOfFile: filepath)

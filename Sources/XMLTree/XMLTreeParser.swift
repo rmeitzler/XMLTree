@@ -7,14 +7,14 @@
 
 import Foundation
 
-class XMLTreeParser: NSObject, XMLParserDelegate {
+public class XMLTreeParser: NSObject, XMLParserDelegate {
   private var parser: XMLParser
-  var output: XMLTree = XMLTree(name: "", depth: 0)
-  var depth = 0
+  public var output: XMLTree = XMLTree(name: "", depth: 0)
+  private var depth = 0
   
-  var buildingSet: [XMLTree] = []
+  private var buildingSet: [XMLTree] = []
   
-  init(_ data: Data) {
+  public init(_ data: Data) {
     parser = XMLParser(data: data)
     super.init()
     

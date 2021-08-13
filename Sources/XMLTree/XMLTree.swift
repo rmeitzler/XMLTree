@@ -7,29 +7,29 @@
 
 import Foundation
 
-protocol XMLTreeDecodable {
+public protocol XMLTreeDecodable {
   init(from xml: XMLTree) throws
 }
 
-struct XMLTree: Identifiable, Equatable, Hashable {
-  static func == (lhs: XMLTree, rhs: XMLTree) -> Bool {
+public struct XMLTree: Identifiable, Equatable, Hashable {
+  public static func == (lhs: XMLTree, rhs: XMLTree) -> Bool {
     lhs.id == rhs.id
   }
   
-  func hash(into hasher: inout Hasher) {
+  public func hash(into hasher: inout Hasher) {
       hasher.combine(id.uuidString)
       hasher.combine(name)
       hasher.combine(attributes)
   }
   
-  var id: UUID = UUID()
-  var name: String
-  var depth: Int
-  var children: [XMLTree]?
-  var attributes: [String:String] = [:]
-  var value: String?
+  public var id: UUID = UUID()
+  public var name: String
+  public var depth: Int
+  public var children: [XMLTree]?
+  public var attributes: [String:String] = [:]
+  public var value: String?
   
-  mutating func addChild(_ child: XMLTree) {
+  public mutating func addChild(_ child: XMLTree) {
     if children != nil {
       children?.append(child)
     } else {
@@ -37,15 +37,15 @@ struct XMLTree: Identifiable, Equatable, Hashable {
     }
   }
   
-  mutating func addAttributes(key: String, value: String) {
+  public mutating func addAttributes(key: String, value: String) {
     attributes[key] = value
   }
   
-  mutating func updateName(_ newName: String) {
+  public mutating func updateName(_ newName: String) {
     name = newName
   }
   
-  static func decodeAll<T: XMLTreeDecodable>(from: [XMLTree]?) throws -> [T]? {
+  public static func decodeAll<T: XMLTreeDecodable>(from: [XMLTree]?) throws -> [T]? {
     var output: [T] = []
     do {
       if let data = from, !data.isEmpty {
@@ -60,7 +60,7 @@ struct XMLTree: Identifiable, Equatable, Hashable {
     return output.count > 0 ? output : nil
   }
   
-  func child(named: String) -> XMLTree? {
+  public func child(named: String) -> XMLTree? {
     guard let result = self.children?.filter({$0.name == named}).map({$0}).first else {
       return nil
     }
@@ -68,7 +68,7 @@ struct XMLTree: Identifiable, Equatable, Hashable {
     return result
   }
   
-  func valueOfChild(named: String) -> String? {
+  public func valueOfChild(named: String) -> String? {
     guard let result = self.children?.filter({$0.name == named}).map({$0}).first?.value else {
       return nil
     }
@@ -76,7 +76,7 @@ struct XMLTree: Identifiable, Equatable, Hashable {
     return result
   }
   
-  func valuesOfChildren() -> [String]? {
+  public func valuesOfChildren() -> [String]? {
     guard let result = self.children?.compactMap({ $0.value }) else {
       return nil
     }
@@ -84,14 +84,14 @@ struct XMLTree: Identifiable, Equatable, Hashable {
     return result
   }
   
-  func attr(_ key: String) throws -> String {
+  public func attr(_ key: String) throws -> String {
       guard let result = self.attributes[key] else {
         throw XMLTreeError.attributeNotFound(key)
       }
       return result
   }
   
-  func attrIfPresent(_ key: String) -> String? {
+  public func attrIfPresent(_ key: String) -> String? {
       guard let result = self.attributes[key] else {
         return nil
       }
@@ -101,7 +101,7 @@ struct XMLTree: Identifiable, Equatable, Hashable {
 }
 
 extension Optional where Wrapped == [XMLTree] {
-  func decodeAll<T: XMLTreeDecodable>() throws -> [T]? {
+  public func decodeAll<T: XMLTreeDecodable>() throws -> [T]? {
     var output: [T] = []
 
       if let data = self {
@@ -115,17 +115,17 @@ extension Optional where Wrapped == [XMLTree] {
 }
 
 extension XMLTree {
-  func decode<T: XMLTreeDecodable>() throws -> T {
+  public func decode<T: XMLTreeDecodable>() throws -> T {
     let element: T = try T(from: self)
     return element
   }
-  func decodeIfPresent<T: XMLTreeDecodable>() throws -> T? {
+  public func decodeIfPresent<T: XMLTreeDecodable>() throws -> T? {
     let output: T? = try T(from: self)
     return output
   }
 }
 
-enum XMLTreeError: Error {
+public enum XMLTreeError: Error {
     case couldNotDecodeClass(String)
     case attributeNotFound(String)
     case problemDecodingNode(String)
