@@ -22,12 +22,21 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
       hasher.combine(attributes)
   }
   
-  public var id: UUID = UUID()
+  public var id: UUID
   public var name: String
   public var depth: Int
   public var children: [XMLTree]?
-  public var attributes: [String:String] = [:]
+  public var attributes: [String:String]
   public var value: String?
+  
+  public init(name: String, depth: Int, children: [XMLTree]? = nil, attributes: [String:String] = [:], value: String? = nil) {
+    self.id = UUID()
+    self.name = name
+    self.depth = depth
+    self.children = children
+    self.attributes = attributes
+    self.value = value
+  }
   
   public mutating func addChild(_ child: XMLTree) {
     if children != nil {
