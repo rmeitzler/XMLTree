@@ -37,7 +37,7 @@ public class XMLManager: ObservableObject {
     }
   }
   
-  public func parseXML(data: Data?) {
+  public func parseXML(data xmlData: Data?) {
     if let data = xmlData {
       let parser = XMLTreeParser(data)
       treeData = parser.output
