@@ -9,8 +9,9 @@ import Foundation
 
 internal class XMLTreeParser: NSObject, XMLParserDelegate {
   private var parser: XMLParser
-  internal var output: XMLTree = XMLTree(name: "", depth: 0)
+  internal var output: XMLTree = XMLTree(name: "", depth: 0, breadcrumb: [])
   private var depth = 0
+  private var runningBreadcrumb: [XMLSilo] = []
   
   private var buildingSet: [XMLTree] = []
   
@@ -25,7 +26,8 @@ internal class XMLTreeParser: NSObject, XMLParserDelegate {
   
   internal func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:])
       {
-        var element = XMLTree(name: elementName, depth: depth)
+        var element = XMLTree(name: elementName, depth: depth, breadcrumb: runningBreadcrumb)
+        runningBreadcrumb.append(XMLSilo(from: element))
         element.attributes = attributeDict
         buildingSet.append(element)
         depth += 1
@@ -37,12 +39,16 @@ internal class XMLTreeParser: NSObject, XMLParserDelegate {
         if let popped = buildingSet.popLast() {
           let idx = buildingSet.count - 1
           if idx >= 0 {
-            buildingSet[idx].addChild(popped)
+            var mutatingPopped = popped
+              let parentID = buildingSet[idx].id
+              mutatingPopped.updateParent(parentID)
+            buildingSet[idx].addChild(mutatingPopped)
           } else {
             output = popped
           }
         }
         depth -= 1
+        runningBreadcrumb = runningBreadcrumb.dropLast()
       }
       
     

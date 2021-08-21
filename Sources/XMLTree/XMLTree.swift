@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 public protocol XMLTreeDecodable {
   init(from xml: XMLTree) throws
 }
@@ -28,14 +29,35 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
   public var children: [XMLTree]?
   public var attributes: [String:String]
   public var value: String?
+  public var breadcrumb: [XMLSilo]
+  public var parentId: UUID?
   
-  public init(name: String, depth: Int, children: [XMLTree]? = nil, attributes: [String:String] = [:], value: String? = nil) {
+  public init(name: String, depth: Int, breadcrumb: [XMLSilo], children: [XMLTree]? = nil, attributes: [String:String] = [:], value: String? = nil) {
     self.id = UUID()
     self.name = name
     self.depth = depth
     self.children = children
     self.attributes = attributes
     self.value = value
+    self.breadcrumb = breadcrumb
+  }
+  
+  public var nameAttribute: String? {
+    guard attributes.keys.contains("Name") else {
+      return nil
+    }
+    return attributes["Name"]
+  }
+  
+  public var idAttribute: String? {
+    guard attributes.keys.contains("Id") else {
+      return nil
+    }
+    return attributes["Id"]
+  }
+  
+  public var namedBreadcrumbs: String {
+    return breadcrumb.map({$0.name}).joined(separator: ">")
   }
   
   public mutating func addChild(_ child: XMLTree) {
@@ -46,12 +68,33 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     }
   }
   
+  public mutating func removeChild(_ child: XMLTree) {
+    if let idx = children?.firstIndex(of: child) {
+      children?.remove(at: idx)
+    }
+  }
+  
   public mutating func addAttributes(key: String, value: String) {
     attributes[key] = value
   }
   
   public mutating func updateName(_ newName: String) {
     name = newName
+  }
+  
+  public mutating func updateParent(_ uuid: UUID) {
+    parentId = uuid
+  }
+  
+  public mutating func regenerateId() {
+    let newId = UUID()
+    id = newId
+    
+    if let childCt = children?.count {
+      for idx in 0..<childCt {
+        children?[idx].parentId = newId
+      }
+    }
   }
   
   public static func decodeAll<T: XMLTreeDecodable>(from: [XMLTree]?) throws -> [T]? {
@@ -67,6 +110,52 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
       throw XMLTreeError.couldNotDecodeClass(String(describing: T.self))
     }
     return output.count > 0 ? output : nil
+  }
+  
+  static func crawl(node: XMLTree, for id: UUID) -> XMLTree? {
+    
+    if node.id.uuidString == id.uuidString {
+      return node
+    } else {
+      var possibleResult: XMLTree?
+      if let kids = node.children {
+        for child in kids {
+          let result = crawl(node: child, for: id)
+          if result != nil {
+            possibleResult = result
+            break
+          }
+        }
+      }
+      return  possibleResult
+    }
+  }
+  
+  static func search(node: XMLTree, for term: String) -> [XMLTree] {
+    var matches: [XMLTree] = []
+    
+    if node.containsTerm(term: term) {
+      matches.append( node )
+    } else {
+      if let kids = node.children {
+        for child in kids {
+          let subMatches = search(node: child, for: term)
+          matches.append(contentsOf: subMatches)
+        }
+      }
+    }
+    return matches
+  }
+  
+  func containsTerm(term: String) -> Bool {
+    for (key, value) in self.attributes {
+      if key.lowercased().contains(term.lowercased()) { return true }
+      if value.lowercased().contains(term.lowercased()) { return true }
+    }
+    if let val = value {
+      if val.lowercased().contains(term.lowercased()) { return true }
+    }
+    return false
   }
   
   public func child(named: String) -> XMLTree? {

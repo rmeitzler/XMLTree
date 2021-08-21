@@ -22,6 +22,7 @@ let package = Package(
             dependencies: [],
             sources: [
               "XMLTree.swift",
+              "XMLSilo.swift",
               "XMLTreeManager.swift",
               "XMLTreeParser.swift"
             ]),
