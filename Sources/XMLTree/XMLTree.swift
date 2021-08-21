@@ -112,7 +112,7 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     return output.count > 0 ? output : nil
   }
   
-  static func crawl(node: XMLTree, for id: UUID) -> XMLTree? {
+  public static func crawl(node: XMLTree, for id: UUID) -> XMLTree? {
     
     if node.id.uuidString == id.uuidString {
       return node
@@ -131,7 +131,7 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     }
   }
   
-  static func search(node: XMLTree, for term: String) -> [XMLTree] {
+  public static func search(node: XMLTree, for term: String) -> [XMLTree] {
     var matches: [XMLTree] = []
     
     if node.containsTerm(term: term) {
@@ -147,7 +147,7 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     return matches
   }
   
-  func containsTerm(term: String) -> Bool {
+  public func containsTerm(term: String) -> Bool {
     for (key, value) in self.attributes {
       if key.lowercased().contains(term.lowercased()) { return true }
       if value.lowercased().contains(term.lowercased()) { return true }
