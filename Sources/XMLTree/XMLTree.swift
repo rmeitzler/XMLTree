@@ -131,15 +131,22 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     }
   }
   
-  public static func search(node: XMLTree, for term: String) -> [XMLTree] {
+  public enum XMLSearchType {
+    case exactMatch
+    case containsTerm
+  }
+  
+  public static func search(node: XMLTree, for term: String, type: XMLSearchType) -> [XMLTree] {
     var matches: [XMLTree] = []
     
-    if node.containsTerm(term: term) {
+    if type == .containsTerm && node.containsTerm(term: term) {
+      matches.append( node )
+    } else if type == .exactMatch && node.containsExactTerm(term: term) {
       matches.append( node )
     } else {
       if let kids = node.children {
         for child in kids {
-          let subMatches = search(node: child, for: term)
+          let subMatches = search(node: child, for: term, type: type)
           matches.append(contentsOf: subMatches)
         }
       }
@@ -154,6 +161,17 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     }
     if let val = value {
       if val.lowercased().contains(term.lowercased()) { return true }
+    }
+    return false
+  }
+  
+  public func containsExactTerm(term: String) -> Bool {
+    for (key, value) in self.attributes {
+      if key.lowercased() == term.lowercased() { return true }
+      if value.lowercased() == term.lowercased() { return true }
+    }
+    if let val = value {
+      if val.lowercased() == term.lowercased() { return true }
     }
     return false
   }
