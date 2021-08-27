@@ -28,6 +28,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "XMLTreeTests",
-            dependencies: ["XMLTree"]),
+            dependencies: ["XMLTree"]
+        ),
     ]
 )

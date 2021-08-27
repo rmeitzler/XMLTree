@@ -19,7 +19,10 @@ public class XMLManager: ObservableObject {
   }
   
   public func loadXml(filename: String) {
+    print("loading::\(filename)")
+    
     if let filepath = Bundle.main.path(forResource: filename, ofType: "xml") {
+      
         do {
             let contents = try String(contentsOfFile: filepath)
             xmlData = contents.data(using: .utf8)
@@ -30,6 +33,9 @@ public class XMLManager: ObservableObject {
         }
         catch let XMLTreeError.couldNotDecodeClass(className) {
           print("Could not decode \(className)")
+        }
+        catch let XMLTreeError.problemDecodingNode(node) {
+          print("\(node) broke everything")
         }
         catch {
             print("Could not load file")
