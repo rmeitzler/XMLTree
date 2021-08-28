@@ -143,14 +143,14 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
       matchingNodes.append( node )
     } else if type == .exactMatch && node.containsExactTerm(term: term) {
       matchingNodes.append( node )
-    } //else {
+    } else {
       if let kids = node.children {
         for child in kids {
           let subMatches = search(node: child, for: term, type: type, matches: matchingNodes)
           matchingNodes.append(contentsOf: subMatches)
         }
       }
-    //}
+    }
     return matches
   }
   
