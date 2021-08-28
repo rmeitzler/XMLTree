@@ -136,18 +136,18 @@ public struct XMLTree: Identifiable, Equatable, Hashable {
     case containsTerm
   }
   
-  public static func search(node: XMLTree, for term: String, type: XMLSearchType, matches: [XMLTree] = []) -> [XMLTree] {
-    var matchingNodes: [XMLTree] = matches
+  public static func search(node: XMLTree, for term: String, type: XMLSearchType) -> [XMLTree] {
+    var matches: [XMLTree] = []
     
     if type == .containsTerm && node.containsTerm(term: term) {
-      matchingNodes.append( node )
+      matches.append( node )
     } else if type == .exactMatch && node.containsExactTerm(term: term) {
-      matchingNodes.append( node )
+      matches.append( node )
     } else {
       if let kids = node.children {
         for child in kids {
-          let subMatches = search(node: child, for: term, type: type, matches: matchingNodes)
-          matchingNodes.append(contentsOf: subMatches)
+          let subMatches = search(node: child, for: term, type: type)
+          matches.append(contentsOf: subMatches)
         }
       }
     }
